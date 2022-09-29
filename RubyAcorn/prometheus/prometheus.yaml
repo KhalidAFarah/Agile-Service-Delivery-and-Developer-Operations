@@ -1,0 +1,25 @@
+global:
+ scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'games'
+    static_configs:
+      - targets: ['10.0.60.107']
+
+  - job_name: external_player_numbers
+    dns_sd_configs:
+    - names:
+      - 'tasks.collector'
+      type: 'A'
+      port: 8000
+      
+  - job_name: cadvisor
+    dns_sd_configs:
+    - names:
+      - 'tasks.cadvisor'
+      type: 'A'
+      port: 8080
