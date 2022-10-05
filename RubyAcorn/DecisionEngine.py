@@ -23,28 +23,27 @@ def proactive_rate(title):
     for i in range(len(weight)):
         timestamp = today - datetime.timedelta(days=i, minutes=(-1)).strftime("%Y-%d-%mT%H:%M:%S") # days before today and a minute ahead each day.
         query ="player_count{title='"+title+"'}" # need to the timestamp
-        response = requests.get(f"http://128.39.121.239:9090/api/v1/query?query={query}&time={timestamp}").json()
+        response = requests.get(f"http://128.39.121.239:9090/api/v1/query?query={query}&start={timestamp}&end={timestamp}").json()
         if response['status'] == "success":
             try:
-                weighted_rate += weight[i]*float(response['data']['result'][0]['value'][1])
+                weighted_rate += weight[i]*float(response['data']['result'][0]['values'][0][1])
             except:
                 pass
 
 
 def calculated_replicas(title):
-    reactive_rate = reactive_rate(title)
-    proactive_rate = proactive_rate(title)
+    reactive_rate_value = reactive_rate(title)
+    proactive_rate_value = proactive_rate(title)
 
-    reactive_replicas = round(reactive_rate) + 1
-    proactive_replicas = round(proactive_rate) + 1
-    yield reactive_replicas, proactive_replicas
+    reactive_replicas = (round(reactive_rate_value/29231) + 1)
+    proactive_replicas = (round(proactive_rate_value/29231) + 1)
 
 
 
     if reactive_replicas > proactive_replicas:
-        return reactive_replicas
+        return reactive_replicas, proactive_replicas, reactive_replicas
     else:
-        return proactive_replicas
+        return reactive_replicas, proactive_replicas, proactive_replicas
 
 
 #startup
